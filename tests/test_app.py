@@ -9,6 +9,7 @@ from conftest import (
     EXAMPLE_DIR,
     EXTENSION_DIR,
     INVALID_RESOURCES,
+    TEST_SITE_ROOT,
     copy_resources_into_ig
 )
 
@@ -114,7 +115,14 @@ def test_custom_validate(resource_dict, error_msg):
 def test_update_ig(debug_caplog, filepath, error_msg):
     # Run add command
     runner = CliRunner()
-    result = runner.invoke(cli.add, [filepath])
+    result = runner.invoke(
+        cli.add,
+        [
+            filepath,
+            '--ig_control_file',
+            os.path.join(TEST_SITE_ROOT, 'ig.ini')
+        ]
+    )
     assert result.exit_code != 0
     assert error_msg in debug_caplog.text
 
