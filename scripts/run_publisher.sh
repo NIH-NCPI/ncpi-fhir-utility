@@ -32,7 +32,8 @@ docker pull $docker_image
 # Run ig-publisher in a docker container
 ig_site_dir=$(dirname "$ig_control_file")
 ig_control_file=$(basename "$ig_control_file")
-docker run --rm -v "$ig_site_dir":/data -v "$HOME/.fhir/packages":/root/.fhir/packages \
+docker run --rm -v "$ig_site_dir":/data \
+-v "$HOME/.fhir/packages":"/root/.fhir/packages" \
 "$docker_image" -ig "/data/$ig_control_file" $publisher_opts
 
 echo "*********** END $(basename $0) script ***********"

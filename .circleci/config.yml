@@ -19,7 +19,6 @@ jobs:
               command: |
                 pyenv global 3.7.0
                 python --version
-
           - run:
               name: Build fhirutil CLI
               command: ./scripts/build.sh
@@ -33,3 +32,6 @@ jobs:
               command: |
                 source ./venv/bin/activate
                 pytest -s tests
+          - run:
+              name: Run package installation and use test
+              command: ./scripts/package_test.sh
