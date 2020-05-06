@@ -2,6 +2,8 @@
 
 set -eo pipefail
 
+trap "exit" INT
+
 echo "*********** START $(basename $0) script ***********"
 
 publisher_opts="${@:2}"
