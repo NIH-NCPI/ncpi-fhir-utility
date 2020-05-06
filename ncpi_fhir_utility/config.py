@@ -49,9 +49,7 @@ ROOT_DIR = os.path.dirname(os.path.dirname(__file__))
 DEFAULT_SITE_ROOT = os.path.join(ROOT_DIR, 'site_root')
 DEFAULT_IG_CONTROL_FILE = os.path.join(DEFAULT_SITE_ROOT, 'ig.ini')
 SCRIPTS_DIR = os.path.join(ROOT_DIR, 'scripts')
-RUN_IG_PUBLISHER_SCRIPT = os.path.join(
-    SCRIPTS_DIR, 'run_publisher.sh'
-)
+RUN_IG_PUBLISHER_SCRIPT = 'run_publisher.sh'
 
 TORINOX_DOCKER_REPO = 'kidsfirstdrc/torinox'
 # Map of fhir version to tuple: (Docker image tag, torinox CLI callable)
