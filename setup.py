@@ -21,5 +21,6 @@ setup(
         ],
     },
     include_package_data=True,
-    install_requires=requirements
+    install_requires=requirements,
+    scripts=['scripts/run_publisher.sh']
 )
