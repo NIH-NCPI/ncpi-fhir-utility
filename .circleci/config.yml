@@ -19,9 +19,11 @@ jobs:
               command: |
                 pyenv global 3.7.0
                 python --version
+
           - run:
               name: Build fhirutil CLI
               command: ./scripts/build.sh
+
           - run:
               name: Pull Docker images
               command: |
@@ -33,6 +35,11 @@ jobs:
                 source ./venv/bin/activate
                 pip install -r dev-requirements.txt
                 pytest -s tests
+
+          - run:
+              name: Run integration tests
+              command: ./scripts/integration_test.sh
+
           - run:
               name: Run package installation and use test
               command: ./scripts/package_test.sh
