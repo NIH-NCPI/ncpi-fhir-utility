@@ -31,6 +31,7 @@ jobs:
               name: Run unit tests
               command: |
                 source ./venv/bin/activate
+                pip install -r dev-requirements.txt
                 pytest -s tests
           - run:
               name: Run package installation and use test
