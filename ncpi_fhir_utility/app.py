@@ -5,6 +5,7 @@ General module for methods called by the ncpi_fhir_utility.cli
     - Publish FHIR data model (conformance and example resources)
       to Simplifier.net
 """
+from collections import defaultdict
 from copy import deepcopy
 from pprint import pformat
 import os
@@ -20,7 +21,8 @@ from ncpi_fhir_utility import loader
 from ncpi_fhir_utility.client import FhirApiClient
 from ncpi_fhir_utility.config import (
     RUN_IG_PUBLISHER_SCRIPT,
-    CONFORMANCE_RESOURCES
+    CONFORMANCE_RESOURCES,
+    RESOURCE_SUBMISSION_ORDER
 )
 
 RESOURCE_ID_DELIM = '-'
@@ -145,7 +147,8 @@ def update_ig_config(data_path, ig_control_filepath, add=True, rm_file=False):
 
 
 def publish_to_server(resource_file_or_dir, base_url, username=None,
-                      password=None, fhir_version=None):
+                      password=None, fhir_version=None,
+                      submission_order=RESOURCE_SUBMISSION_ORDER):
     """
     Push FHIR resources to a FHIR server
 
@@ -178,6 +181,16 @@ def publish_to_server(resource_file_or_dir, base_url, username=None,
         base_url=base_url, auth=auth, fhir_version=fhir_version
     )
     resources = loader.load_resources(resource_file_or_dir)
+
+    # Re-order resources according to submission order
+    resources_by_type = defaultdict(list)
+    for r_dict in resources:
+        resources_by_type[r_dict['resource_type']].append(r_dict)
+    resources = []
+    for r_type in submission_order:
+        resources.extend(resources_by_type.pop(r_type, []))
+    for r_type, remaining in resources_by_type.items():
+        resources.extend(remaining)
 
     # Delete existing resources
     for r_dict in resources:
