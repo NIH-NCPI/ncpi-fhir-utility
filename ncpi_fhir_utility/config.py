@@ -57,8 +57,3 @@ TORINOX_FHIR_VERSION_MAP = {
     'r4': ('torinox.r4-latest', 'fhir4'),
     'stu3': ('torinox-latest', 'fhir')
 }
-
-SIMPLIFIER_USER = os.environ.get('SIMPLIFIER_USER')
-SIMPLIFIER_PW = os.environ.get('SIMPLIFIER_PW')
-SIMPLIFIER_PROJECT_NAME = 'KidsFirstR4'
-SIMPLIFIER_FHIR_SERVER_URL = f'https://fhir.simplifier.net/{SIMPLIFIER_PROJECT_NAME}'  # noqa E5501
