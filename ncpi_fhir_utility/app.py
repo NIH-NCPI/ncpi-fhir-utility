@@ -228,8 +228,13 @@ def publish_to_server(resource_file_or_dir, base_url, username=None,
                 json=r
             )
         if not success:
+            errors = [
+                r
+                for r in results['response']['issue']
+                if r['severity'] == 'error'
+            ]
             raise Exception(
-                f'Publish failed! Caused by:\n{pformat(results["response"])}'
+                f"Publish failed! Caused by:\n{pformat(errors)}"
             )
 
 
