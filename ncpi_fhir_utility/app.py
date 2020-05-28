@@ -6,6 +6,7 @@ General module for methods called by the ncpi_fhir_utility.cli
       to Simplifier.net
 """
 from copy import deepcopy
+from pprint import pformat
 import os
 import logging
 import subprocess
@@ -197,7 +198,7 @@ def publish_to_server(resource_file_or_dir, base_url, username=None,
                 'payload.'
             )
 
-    # POST if no id is provided, PUT if id is provided
+    # POST if no id is provided, PUT if id is provideds
     for r_dict in resources:
         r = r_dict['content']
         id_ = r.get('id')
@@ -212,6 +213,10 @@ def publish_to_server(resource_file_or_dir, base_url, username=None,
                 'post',
                 f'{base_url}/{r["resourceType"]}',
                 json=r
+            )
+        if not success:
+            raise Exception(
+                f'Publish failed! Caused by:\n{pformat(results["response"])}'
             )
 
 
