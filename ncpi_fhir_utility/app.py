@@ -5,7 +5,9 @@ General module for methods called by the ncpi_fhir_utility.cli
     - Publish FHIR data model (conformance and example resources)
       to Simplifier.net
 """
+from collections import defaultdict
 from copy import deepcopy
+from pprint import pformat
 import os
 import logging
 import subprocess
@@ -19,7 +21,8 @@ from ncpi_fhir_utility import loader
 from ncpi_fhir_utility.client import FhirApiClient
 from ncpi_fhir_utility.config import (
     RUN_IG_PUBLISHER_SCRIPT,
-    CONFORMANCE_RESOURCES
+    CONFORMANCE_RESOURCES,
+    RESOURCE_SUBMISSION_ORDER
 )
 
 RESOURCE_ID_DELIM = '-'
@@ -144,7 +147,8 @@ def update_ig_config(data_path, ig_control_filepath, add=True, rm_file=False):
 
 
 def publish_to_server(resource_file_or_dir, base_url, username=None,
-                      password=None, fhir_version=None):
+                      password=None, fhir_version=None,
+                      submission_order=RESOURCE_SUBMISSION_ORDER):
     """
     Push FHIR resources to a FHIR server
 
@@ -178,6 +182,16 @@ def publish_to_server(resource_file_or_dir, base_url, username=None,
     )
     resources = loader.load_resources(resource_file_or_dir)
 
+    # Re-order resources according to submission order
+    resources_by_type = defaultdict(list)
+    for r_dict in resources:
+        resources_by_type[r_dict['resource_type']].append(r_dict)
+    resources = []
+    for r_type in submission_order:
+        resources.extend(resources_by_type.pop(r_type, []))
+    for r_type, remaining in resources_by_type.items():
+        resources.extend(remaining)
+
     # Delete existing resources
     for r_dict in resources:
         r = r_dict['content']
@@ -197,7 +211,7 @@ def publish_to_server(resource_file_or_dir, base_url, username=None,
                 'payload.'
             )
 
-    # POST if no id is provided, PUT if id is provided
+    # POST if no id is provided, PUT if id is provideds
     for r_dict in resources:
         r = r_dict['content']
         id_ = r.get('id')
@@ -212,6 +226,15 @@ def publish_to_server(resource_file_or_dir, base_url, username=None,
                 'post',
                 f'{base_url}/{r["resourceType"]}',
                 json=r
+            )
+        if not success:
+            errors = [
+                r
+                for r in results['response']['issue']
+                if r['severity'] == 'error'
+            ]
+            raise Exception(
+                f"Publish failed! Caused by:\n{pformat(errors)}"
             )
 
 
@@ -240,8 +263,17 @@ def _fhir_validate(ig_control_filepath, publisher_opts):
     logger.info(f'Checking QA report {qa_report} for validation errors')
     qa_json = read_json(qa_path + '.json')
     if qa_json.get('errs'):
+        # Extract error messages from qa.txt
+        errors = []
+        with open(os.path.abspath(qa_path + '.txt')) as qa_txt:
+            for line in qa_txt.readlines():
+                ln = line.strip()
+                if ln.lower().startswith('error') and ('.html' not in ln):
+                    errors.append(ln)
+            errors = '\n'.join(errors)
         raise Exception(
-            f'Errors found in QA report. See {qa_report}'
+            f'Errors found in QA report. See {qa_report} for details:'
+            f'\n\n{errors}\n'
         )
 
 

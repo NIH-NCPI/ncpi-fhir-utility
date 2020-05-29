@@ -45,6 +45,21 @@ CONFORMANCE_RESOURCES = {
     'ExampleScenario'
 }
 
+RESOURCE_SUBMISSION_ORDER = [
+    'CodeSystem',
+    'ValueSet',
+    'StructureDefinition',
+    'SearchParameter',
+    'Patient',
+    'ResearchSubject',
+    'Specimen',
+    'Practitioner',
+    'Organization',
+    'PractitionerRole',
+    'Observation',
+    'Condition'
+]
+
 ROOT_DIR = os.path.dirname(os.path.dirname(__file__))
 DEFAULT_SITE_ROOT = os.path.join(ROOT_DIR, 'site_root')
 DEFAULT_IG_CONTROL_FILE = os.path.join(DEFAULT_SITE_ROOT, 'ig.ini')
@@ -57,8 +72,3 @@ TORINOX_FHIR_VERSION_MAP = {
     'r4': ('torinox.r4-latest', 'fhir4'),
     'stu3': ('torinox-latest', 'fhir')
 }
-
-SIMPLIFIER_USER = os.environ.get('SIMPLIFIER_USER')
-SIMPLIFIER_PW = os.environ.get('SIMPLIFIER_PW')
-SIMPLIFIER_PROJECT_NAME = 'KidsFirstR4'
-SIMPLIFIER_FHIR_SERVER_URL = f'https://fhir.simplifier.net/{SIMPLIFIER_PROJECT_NAME}'  # noqa E5501

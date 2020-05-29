@@ -12,9 +12,6 @@ import click
 from ncpi_fhir_utility.utils import setup_logger
 from ncpi_fhir_utility import loader, app
 from ncpi_fhir_utility.config import (
-    SIMPLIFIER_FHIR_SERVER_URL,
-    SIMPLIFIER_USER,
-    SIMPLIFIER_PW,
     FHIR_VERSION,
     DEFAULT_IG_CONTROL_FILE
 )
@@ -35,19 +32,15 @@ def cli():
 
 @cli.command()
 @click.option('--password', 'password',
-              show_default=False,
-              default=SIMPLIFIER_PW,
               help='Client secret or user password'
               )
 @click.option('--username', 'username',
-              show_default=False,
-              default=SIMPLIFIER_USER,
               help='Client id or username'
               )
 @click.option('--base_url', 'base_url',
               type=str,
               show_default=True,
-              default=SIMPLIFIER_FHIR_SERVER_URL,
+              default='http://localhost:8000',
               help='URL to FHIR server where resources will be pushed'
               )
 @click.argument('resource_file_or_dir',

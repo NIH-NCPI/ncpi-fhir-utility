@@ -1,0 +1,42 @@
+{
+  "resourceType": "Specimen",
+  "id": "bs-001",
+  "meta": {
+    "profile": [
+      "http://hl7.org/fhir/StructureDefinition/Specimen"
+    ]
+  },
+  "identifier": [
+    {
+      "system": "https://kf-api-dataservice.kidsfirstdrc.org/biospecimens?study_id=SD_BHJXBDQK",
+      "value": "571312"
+    }
+  ],
+  "type": {
+    "coding": [
+      {
+        "system": "http://terminology.hl7.org/CodeSystem/v2-0487",
+        "code": "TISS",
+        "display": "Tissue"
+      }
+    ],
+    "text": "Solid Tissue"
+  },
+  "subject": {
+    "reference": "Patient/pt-001"
+  },
+  "receivedTime": "2019-06-15",
+  "collection": {
+    "collectedDateTime": "2019-06-15",
+    "quantity": {
+      "value": 50.0,
+      "unit": "uL"
+    },
+    "bodySite": {
+      "text": "Central Nervous System"
+    },
+    "method": {
+      "text": "Biopsy"
+    }
+  }
+}

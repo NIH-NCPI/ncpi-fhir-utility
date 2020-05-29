@@ -139,8 +139,6 @@ class FhirApiClient(object):
         """
         success = True
 
-        self.logger.info('Begin deleting resources ...')
-
         # Fetch resources to delete
         if not request_kwargs.get('auth'):
             request_kwargs['auth'] = self.auth
@@ -152,6 +150,8 @@ class FhirApiClient(object):
         )
         resp_content = result['response']
         request_url = result['request_url']
+
+        self.logger.info(f'Deleting resources at {request_url}...')
         self.logger.debug(
             f'Fetched {resp_content.get("total")} item(s) from {request_url}'
         )
@@ -231,20 +231,17 @@ class FhirApiClient(object):
             errors = self._errors_from_response(resp_content)
             if not errors:
                 success = True
-                self.logger.debug(
+                self.logger.info(
                     f'{request_method_name} {request_url} succeeded. '
-                    f'Response:\n{pformat(resp_content)}'
                 )
             else:
-                self.logger.debug(
+                self.logger.error(
                     f'{request_method_name} {request_url} failed. '
-                    f'Caused by:\n{pformat(resp_content)}'
                 )
         else:
-            self.logger.debug(
+            self.logger.error(
                 f'{request_method_name} {request_url} failed, '
                 f'status {response.status_code}. '
-                f'Caused by:\n{pformat(resp_content)}'
             )
 
         return success, {'status_code': response.status_code,
