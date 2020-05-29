@@ -263,8 +263,17 @@ def _fhir_validate(ig_control_filepath, publisher_opts):
     logger.info(f'Checking QA report {qa_report} for validation errors')
     qa_json = read_json(qa_path + '.json')
     if qa_json.get('errs'):
+        # Extract error messages from qa.txt
+        errors = []
+        with open(os.path.abspath(qa_path + '.txt')) as qa_txt:
+            for line in qa_txt.readlines():
+                ln = line.strip()
+                if ln.lower().startswith('error') and ('.html' not in ln):
+                    errors.append(ln)
+            errors = '\n'.join(errors)
         raise Exception(
-            f'Errors found in QA report. See {qa_report}'
+            f'Errors found in QA report. See {qa_report} for details:'
+            f'\n\n{errors}\n'
         )
 
 
