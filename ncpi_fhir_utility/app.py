@@ -22,16 +22,15 @@ from ncpi_fhir_utility.client import FhirApiClient
 from ncpi_fhir_utility.config import (
     RUN_IG_PUBLISHER_SCRIPT,
     CONFORMANCE_RESOURCES,
-    RESOURCE_SUBMISSION_ORDER
+    RESOURCE_SUBMISSION_ORDER,
 )
 
-RESOURCE_ID_DELIM = '-'
+RESOURCE_ID_DELIM = "-"
 FILENAME_DELIM = RESOURCE_ID_DELIM
 logger = logging.getLogger(__name__)
 
 
-def validate(ig_control_filepath, clear_output=False,
-             publisher_opts=''):
+def validate(ig_control_filepath, clear_output=False, publisher_opts=""):
     """
     Validate the FHIR data model (FHIR conformance and example resources)
 
@@ -59,8 +58,7 @@ def validate(ig_control_filepath, clear_output=False,
     to the publisher CLI
     :type publisher_opts: str
     """
-    logger.info('Begin validation of FHIR data model')
-
+    logger.info("Begin validation of FHIR data model")
     ig_control_filepath = os.path.abspath(
         os.path.expanduser(ig_control_filepath)
     )
@@ -75,12 +73,12 @@ def validate(ig_control_filepath, clear_output=False,
     # Collect resource filepaths
     resource_dicts = []
     site_root = os.path.dirname(ig_control_filepath)
-    ig = ig_resource_dict['content']
-    for param in ig.get('definition', {}).get('parameter', []):
-        if param.get('code') != 'path-resource':
+    ig = ig_resource_dict["content"]
+    for param in ig.get("definition", {}).get("parameter", []):
+        if param.get("code") != "path-resource":
             continue
         resource_dicts.extend(
-            loader.load_resources(os.path.join(site_root, param.get('value')))
+            loader.load_resources(os.path.join(site_root, param.get("value")))
         )
 
     # Validate and add resource to IG configuration
@@ -92,7 +90,7 @@ def validate(ig_control_filepath, clear_output=False,
     # Do the standard HL7 FHIR validation via the IG Publisher
     _fhir_validate(ig_control_filepath, publisher_opts)
 
-    logger.info('End validation of FHIR data model')
+    logger.info("End validation of FHIR data model")
 
 
 def clear_ig_output(ig_control_filepath):
@@ -103,12 +101,10 @@ def clear_ig_output(ig_control_filepath):
     :type ig_control_filepath: str
     """
     site_root = os.path.dirname(ig_control_filepath)
-    for dir in ['output', 'temp', 'template', 'input-cache']:
+    for dir in ["output", "temp", "template", "input-cache"]:
         p = os.path.join(site_root, dir)
         if os.path.exists(p):
-            logger.info(
-                f'Clearing all previously generated output at: {p}'
-            )
+            logger.info(f"Clearing all previously generated output at: {p}")
             rmtree(p)
 
 
@@ -136,9 +132,7 @@ def update_ig_config(data_path, ig_control_filepath, add=True, rm_file=False):
     # Load resource dicts
     resource_dicts = loader.load_resources(data_path)
     # Load IG resource dict
-    ig_resource_dict = deepcopy(
-        _load_ig_resource_dict(ig_control_filepath)
-    )
+    ig_resource_dict = deepcopy(_load_ig_resource_dict(ig_control_filepath))
     # Validate and add resource to IG configuration
     _custom_validate(resource_dicts)
 
@@ -146,9 +140,14 @@ def update_ig_config(data_path, ig_control_filepath, add=True, rm_file=False):
     _update_ig_config(resource_dicts, ig_resource_dict)
 
 
-def publish_to_server(resource_file_or_dir, base_url, username=None,
-                      password=None, fhir_version=None,
-                      submission_order=RESOURCE_SUBMISSION_ORDER):
+def publish_to_server(
+    resource_file_or_dir,
+    base_url,
+    username=None,
+    password=None,
+    fhir_version=None,
+    submission_order=RESOURCE_SUBMISSION_ORDER,
+):
     """
     Push FHIR resources to a FHIR server
 
@@ -169,7 +168,7 @@ def publish_to_server(resource_file_or_dir, base_url, username=None,
     :type fhir_version: str
     """
     logger.info(
-        f'Begin publishing resources in {resource_file_or_dir} to {base_url}'
+        f"Begin publishing resources in {resource_file_or_dir} to {base_url}"
     )
 
     if username and password:
@@ -185,7 +184,7 @@ def publish_to_server(resource_file_or_dir, base_url, username=None,
     # Re-order resources according to submission order
     resources_by_type = defaultdict(list)
     for r_dict in resources:
-        resources_by_type[r_dict['resource_type']].append(r_dict)
+        resources_by_type[r_dict["resource_type"]].append(r_dict)
     resources = []
     for r_type in submission_order:
         resources.extend(resources_by_type.pop(r_type, []))
@@ -194,48 +193,41 @@ def publish_to_server(resource_file_or_dir, base_url, username=None,
 
     # Delete existing resources
     for r_dict in resources:
-        r = r_dict['content']
-        if 'url' in r:
+        r = r_dict["content"]
+        if "url" in r:
             success = client.delete_all(
-                f'{base_url}/{r["resourceType"]}', params={'url': r['url']}
+                f'{base_url}/{r["resourceType"]}', params={"url": r["url"]}
             )
-        elif 'id' in r:
+        elif "id" in r:
             success, results = client.send_request(
-                'delete',
-                f'{base_url}/{r["resourceType"]}/{r["id"]}'
+                "delete", f'{base_url}/{r["resourceType"]}/{r["id"]}'
             )
         else:
             logger.warning(
                 f'⚠️ Could not delete {r_dict["filename"]}. No way to '
-                'identify the resource. Tried looking for `url` and `id` in '
-                'payload.'
+                "identify the resource. Tried looking for `url` and `id` in "
+                "payload."
             )
 
     # POST if no id is provided, PUT if id is provideds
     for r_dict in resources:
-        r = r_dict['content']
-        id_ = r.get('id')
+        r = r_dict["content"]
+        id_ = r.get("id")
         if id_:
             success, results = client.send_request(
-                'put',
-                f'{base_url}/{r["resourceType"]}/{id_}',
-                json=r
+                "put", f'{base_url}/{r["resourceType"]}/{id_}', json=r
             )
         else:
             success, results = client.send_request(
-                'post',
-                f'{base_url}/{r["resourceType"]}',
-                json=r
+                "post", f'{base_url}/{r["resourceType"]}', json=r
             )
         if not success:
             errors = [
                 r
-                for r in results['response']['issue']
-                if r['severity'] == 'error'
+                for r in results["response"]["issue"]
+                if r["severity"] == "error"
             ]
-            raise Exception(
-                f"Publish failed! Caused by:\n{pformat(errors)}"
-            )
+            raise Exception(f"Publish failed! Caused by:\n{pformat(errors)}")
 
 
 def _fhir_validate(ig_control_filepath, publisher_opts):
@@ -258,22 +250,22 @@ def _fhir_validate(ig_control_filepath, publisher_opts):
 
     # Check QA report for validation errors
     site_root = os.path.dirname(ig_control_filepath)
-    qa_path = os.path.join(site_root, 'output', 'qa')
-    qa_report = os.path.abspath(qa_path + '.html')
-    logger.info(f'Checking QA report {qa_report} for validation errors')
-    qa_json = read_json(qa_path + '.json')
-    if qa_json.get('errs'):
+    qa_path = os.path.join(site_root, "output", "qa")
+    qa_report = os.path.abspath(qa_path + ".html")
+    logger.info(f"Checking QA report {qa_report} for validation errors")
+    qa_json = read_json(qa_path + ".json")
+    if qa_json.get("errs"):
         # Extract error messages from qa.txt
         errors = []
-        with open(os.path.abspath(qa_path + '.txt')) as qa_txt:
+        with open(os.path.abspath(qa_path + ".txt")) as qa_txt:
             for line in qa_txt.readlines():
                 ln = line.strip()
-                if ln.lower().startswith('error') and ('.html' not in ln):
+                if ln.lower().startswith("error") and (".html" not in ln):
                     errors.append(ln)
-            errors = '\n'.join(errors)
+            errors = "\n".join(errors)
         raise Exception(
-            f'Errors found in QA report. See {qa_report} for details:'
-            f'\n\n{errors}\n'
+            f"Errors found in QA report. See {qa_report} for details:"
+            f"\n\n{errors}\n"
         )
 
 
@@ -291,53 +283,49 @@ def _custom_validate(resource_dicts):
     4. File name must follow format <resource type>-<resource id>
     """
     for rd in resource_dicts:
-        res = rd['content']
+        res = rd["content"]
         # Check if id is present
-        rid = res.get('id')
+        rid = res.get("id")
         if not rid:
             raise KeyError(
-                'All resources must have an `id` attribute. Resource file: '
+                "All resources must have an `id` attribute. Resource file: "
                 f'{rd["filepath"]} is missing `id` or `id` is null.'
             )
         # If StructureDefinition check that URL is valid
-        if res['resourceType'] == 'StructureDefinition':
-            if not res.get('url'):
+        if res["resourceType"] == "StructureDefinition":
+            if not res.get("url"):
                 raise KeyError(
-                    'All StructureDefinition resources must have a `url`. '
+                    "All StructureDefinition resources must have a `url`. "
                     f'Resource file: {rd["filepath"]} is missing `url` or '
-                    '`url` is null.'
+                    "`url` is null."
                 )
-            url_parts = res.get('url').split('/')
-            if res['id'] != url_parts[-1]:
+            url_parts = res.get("url").split("/")
+            if res["id"] != url_parts[-1]:
                 raise ValueError(
-                    'Invalid value for `url` in StructureDefinition: '
+                    "Invalid value for `url` in StructureDefinition: "
                     f'{rd["filepath"]}. Value should be: '
                     f'{"/".join(url_parts + [res["id"]])}'
                 )
 
         # Try to check if id follows kebab-case (won't be perfect)
-        expected_id = camel_to_snake(rid).replace('_', '-')
+        expected_id = camel_to_snake(rid).replace("_", "-")
         if rid != expected_id:
             raise ValueError(
-                'Resource id must adhere to kebab-case (lowercase with '
+                "Resource id must adhere to kebab-case (lowercase with "
                 f'hyphens between tokens). The `id` "{rid}" in '
                 f'{rd["filepath"]} should be: {expected_id}'
             )
         # Check filename
-        filename, ext = os.path.splitext(
-            os.path.split(rd['filepath'])[-1]
-        )
-        rtype = rd.get('resource_type')
-        expected_filename = f'{rtype}-{rid}'
+        filename, ext = os.path.splitext(os.path.split(rd["filepath"])[-1])
+        rtype = rd.get("resource_type")
+        expected_filename = f"{rtype}-{rid}"
         if filename != expected_filename:
             raise ValueError(
-                'Resource file names must follow pattern: '
-                f'<resource type>-<resource id>.json. File {filename}{ext} '
-                f'should be: {expected_filename}{ext}'
+                "Resource file names must follow pattern: "
+                f"<resource type>-<resource id>.json. File {filename}{ext} "
+                f"should be: {expected_filename}{ext}"
             )
-        logger.info(
-            f'☑️ Initial validation passed for resource {filename+ext}'
-        )
+        logger.info(f"☑️ Initial validation passed for resource {filename+ext}")
 
 
 def _update_ig_config(
@@ -347,24 +335,24 @@ def _update_ig_config(
     Helper for update_ig_config
     """
     # Collect resource ids from the input set of resources
-    resource_set = set([
+    resource_set = {
         f'{r["content"]["resourceType"]}/{r["content"]["id"]}'
         for r in resource_dicts
-    ])
+    }
     # Reformat IG resource list into a dict so its easier to update
-    ig_resource = ig_resource_dict['content']
+    ig_resource = ig_resource_dict["content"]
     resources_dict = {}
-    for r in ig_resource['definition']['resource']:
+    for r in ig_resource["definition"]["resource"]:
         # Only include resources from IG config that have corresponding filess
         # Old IG entries will be discarded
-        key = r['reference']['reference']
+        key = r["reference"]["reference"]
         if key in resource_set:
             resources_dict[key] = r
         else:
-            logger.info(f'🔥 Removing old entry {key} from IG')
+            logger.info(f"🔥 Removing old entry {key} from IG")
 
     for rd in resource_dicts:
-        if rd['resource_type'] == 'ImplementationGuide':
+        if rd["resource_type"] == "ImplementationGuide":
             continue
 
         # Create the config entry
@@ -372,22 +360,21 @@ def _update_ig_config(
 
         # Add/remove configuration entries
         if add:
-            resources_dict[entry['reference']['reference']] = entry
+            resources_dict[entry["reference"]["reference"]] = entry
         else:
-            del rd[entry['reference']['reference']]
+            del rd[entry["reference"]["reference"]]
             if rm_file:
-                os.rmfile(rd['filepath'])
+                os.rmfile(rd["filepath"])
                 logger.info(f'🗑 Deleted resource file {rd["filepath"]}')
 
         logger.info(f'☑️ Added IG configuration for {rd["filename"]}')
 
     # Format resource dict back to original list
-    ig_resource['definition']['resource'] = [
-        resources_dict[k]
-        for k in resources_dict
+    ig_resource["definition"]["resource"] = [
+        resources_dict[k] for k in resources_dict
     ]
     write_json(
-        ig_resource_dict['content'], ig_resource_dict['filepath'], indent=2
+        ig_resource_dict["content"], ig_resource_dict["filepath"], indent=2
     )
 
 
@@ -400,35 +387,34 @@ def _create_resource_config(resource_dict):
     :type resource_dict: dict
     :returns: IG config entry for the resource
     """
-    rid = resource_dict['content'].get('id')
-    rtype = resource_dict['content'].get('resourceType')
-    suffix = ''
+    rid = resource_dict["content"].get("id")
+    rtype = resource_dict["content"].get("resourceType")
+    suffix = ""
 
     if rtype in CONFORMANCE_RESOURCES:
         is_example = False
-        base = resource_dict['content'].get('baseDefinition')
+        base = resource_dict["content"].get("baseDefinition")
         if base:
-            base = base.split('/')[-1]
-            suffix = f', Base: {base}'
+            base = base.split("/")[-1]
+            suffix = f", Base: {base}"
     else:
         is_example = True
-        profiles = (
-            ','.join([
-                p.split('/')[-1]
-                for p in resource_dict['content']
-                .get('meta', {}).get('profile', [])
-            ])
+        profiles = ",".join(
+            [
+                p.split("/")[-1]
+                for p in resource_dict["content"]
+                .get("meta", {})
+                .get("profile", [])
+            ]
         )
         if profiles:
-            suffix = f', Profiles: {profiles}'
+            suffix = f", Profiles: {profiles}"
 
     return {
-        "reference": {
-            "reference": f"{rtype}/{rid}"
-        },
+        "reference": {"reference": f"{rtype}/{rid}"},
         "name": f"Kids First {rtype}/{rid}",
         "description": f"Kids First {rtype} {rid}{suffix}",
-        "exampleBoolean": is_example
+        "exampleBoolean": is_example,
     }
 
 
@@ -451,6 +437,6 @@ def _load_ig_resource_dict(ig_control_filepath):
 
     # Read in ig resource file
     ig_filepath = os.path.join(
-        os.path.split(ig_control_filepath)[0], dict(ig_config['IG']).get('ig')
+        os.path.split(ig_control_filepath)[0], dict(ig_config["IG"]).get("ig")
     )
     return loader.load_resources(ig_filepath)[0]
