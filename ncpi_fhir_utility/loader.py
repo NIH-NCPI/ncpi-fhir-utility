@@ -13,13 +13,13 @@ from ncpi_fhir_utility.config import (
     TORINOX_DOCKER_REPO as DOCKER_REPO,
     FHIR_VERSION,
     TORINOX_FHIR_VERSION_MAP,
-    fhir_version_name
+    fhir_version_name,
 )
 
 logger = logging.getLogger(__name__)
 
 
-def fhir_format_all(data_dir, output_format='json', fhir_version=FHIR_VERSION):
+def fhir_format_all(data_dir, output_format="json", fhir_version=FHIR_VERSION):
     """
     Convert all files in the directory data_path to the specified
     output format. Write each converted result to file. See fhir_format for
@@ -38,12 +38,17 @@ def fhir_format_all(data_dir, output_format='json', fhir_version=FHIR_VERSION):
             filepath,
             output_format=output_format,
             write_to_file=True,
-            fhir_version=fhir_version
+            fhir_version=fhir_version,
         )
 
 
-def fhir_format(data_path, output_format='json', write_to_file=False,
-                output_filepath=None, fhir_version=FHIR_VERSION):
+def fhir_format(
+    data_path,
+    output_format="json",
+    write_to_file=False,
+    output_filepath=None,
+    fhir_version=FHIR_VERSION,
+):
     """
     Convert FHIR resource XML to JSON and vice versa.
 
@@ -74,50 +79,49 @@ def fhir_format(data_path, output_format='json', write_to_file=False,
     file_ext = os.path.splitext(file_name)[-1]
 
     logger.info(
-        f'Converting content of {file_ext} file {data_path} to '
-        f'{output_format} format ... '
+        f"Converting content of {file_ext} file {data_path} to "
+        f"{output_format} format ... "
     )
 
     # Do FHIR format conversion
     TAG, APP = TORINOX_FHIR_VERSION_MAP.get(fhir_version_name(FHIR_VERSION))
     cmd_str = (
-        f'docker run --rm -v {dirname}:/fhir_data {DOCKER_REPO}:{TAG} '
-        f'{APP} show /fhir_data/{file_name} --{output_format}'
+        f"docker run --rm -v {dirname}:/fhir_data {DOCKER_REPO}:{TAG} "
+        f"{APP} show /fhir_data/{file_name} --{output_format}"
     )
-    logger.debug(f'Using {cmd_str}')
-    output = subprocess.run(cmd_str, shell=True,
-                            stdout=subprocess.PIPE,
-                            stderr=subprocess.STDOUT)
-    output_str = output.stdout.decode('utf-8')
+    logger.debug(f"Using {cmd_str}")
+    output = subprocess.run(
+        cmd_str, shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT
+    )
+    output_str = output.stdout.decode("utf-8")
     if output.returncode != 0:
         raise Exception(
-            f'Could not convert {file_ext} file {data_path} to '
-            f'{output_format} file! Caused by \n\n{output_str}'
+            f"Could not convert {file_ext} file {data_path} to "
+            f"{output_format} file! Caused by \n\n{output_str}"
         )
 
-    logger.debug(f'Converted content:{output_str}')
+    logger.debug(f"Converted content:{output_str}")
 
     # Write output
     if write_to_file:
         if not output_filepath:
             output_filepath = os.path.join(
-                dirname, os.path.splitext(file_name)[0] + f'.{output_format}'
+                dirname, os.path.splitext(file_name)[0] + f".{output_format}"
             )
         # Don't overwrite existing files
         if os.path.isfile(output_filepath):
             raise FileExistsError(
-                f'Convert {file_ext} file {data_path} to '
-                f'{output_format} failed! The file {output_filepath} '
-                'already exists!'
+                f"Convert {file_ext} file {data_path} to "
+                f"{output_format} failed! The file {output_filepath} "
+                "already exists!"
             )
-        if output_format == 'json':
-            write_json(json.loads(output_str), output_filepath,
-                       sort_keys=False)
+        if output_format == "json":
+            write_json(json.loads(output_str), output_filepath, sort_keys=False)
         else:
-            with open(output_filepath, 'w') as xml_file:
+            with open(output_filepath, "w") as xml_file:
                 xml_file.write(output_str)
 
-        logger.info(f'Converted content written to {output_filepath}')
+        logger.info(f"Converted content written to {output_filepath}")
 
         return output_str, output_filepath
     else:
@@ -164,33 +168,33 @@ def read_resource_file(filepath):
     :type filepath: str
     :returns: dict with resource content and metadata
     """
-    logger.debug(f'Reading resource file: {filepath}')
+    logger.debug(f"Reading resource file: {filepath}")
 
     _, filename = os.path.split(filepath)
     file_ext = os.path.splitext(filename)[-1]
     resource_dict = None
 
-    if file_ext == '.json':
+    if file_ext == ".json":
         resource = read_json(filepath)
 
-    elif file_ext == '.xml':
-        resource_json_str = fhir_format(filepath,
-                                        output_format='json',
-                                        write_to_file=False)
+    elif file_ext == ".xml":
+        resource_json_str = fhir_format(
+            filepath, output_format="json", write_to_file=False
+        )
         resource = json.loads(resource_json_str)
 
-    if file_ext in {'.json', '.xml'}:
+    if file_ext in {".json", ".xml"}:
         resource_dict = {
-            'filepath': filepath,
-            'filename': filename,
-            'content': resource,
-            'content_type': 'json',
-            'resource_type': resource.get('resourceType')
+            "filepath": filepath,
+            "filename": filename,
+            "content": resource,
+            "content_type": "json",
+            "resource_type": resource.get("resourceType"),
         }
     else:
         logger.warning(
             f'Skipping "{filename}", {file_ext} is an invalid resource '
-            'file type'
+            "file type"
         )
 
     return resource_dict
@@ -211,9 +215,8 @@ def path_to_valid_filepaths_list(data_path):
         for root, dirs, files in os.walk(data_path):
             for f in files:
                 fn, ext = os.path.splitext(f)
-                if (
-                    (f not in {'package.json', 'fhirpkg.lock.json'}) and
-                    (ext in {'.xml', '.json'})
+                if (f not in {"package.json", "fhirpkg.lock.json"}) and (
+                    ext in {".xml", ".json"}
                 ):
                     filepaths.append(os.path.join(root, f))
 

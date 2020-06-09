@@ -23,9 +23,7 @@ def setup_logger(log_level=DEFAULT_LOG_LEVEL):
     values are the names of Python's standard lib logging levels.
     (critical, error, warning, info, debug, notset)
     """
-    DEFAULT_FORMAT = (
-        '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
-    )
+    DEFAULT_FORMAT = "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
     # Setup console handler
     consoleHandler = logging.StreamHandler()
     consoleHandler.setFormatter(logging.Formatter(DEFAULT_FORMAT))
@@ -48,8 +46,11 @@ def timestamp():
     else:
         utc_offset_sec = time.timezone
     utc_offset = datetime.timedelta(seconds=-utc_offset_sec)
-    t = datetime.datetime.now().replace(
-        tzinfo=datetime.timezone(offset=utc_offset)).isoformat()
+    t = (
+        datetime.datetime.now()
+        .replace(tzinfo=datetime.timezone(offset=utc_offset))
+        .isoformat()
+    )
 
     return str(t)
 
@@ -69,7 +70,7 @@ def read_json(filepath, default=None):
     if (default is not None) and (not os.path.isfile(filepath)):
         return default
 
-    with open(filepath, 'r') as data_file:
+    with open(filepath, "r") as data_file:
         return json.load(data_file)
 
 
@@ -83,17 +84,22 @@ def write_json(data, filepath, **kwargs):
     :type filepath: str
     :param \**kwargs: keyword arguments to pass to json.dump
     """
-    if 'indent' not in kwargs:
-        kwargs['indent'] = 4
-    if 'sort_keys' not in kwargs:
-        kwargs['sort_keys'] = True
-    with open(filepath, 'w') as json_file:
+    if "indent" not in kwargs:
+        kwargs["indent"] = 4
+    if "sort_keys" not in kwargs:
+        kwargs["sort_keys"] = True
+    with open(filepath, "w") as json_file:
         json.dump(data, json_file, **kwargs)
 
 
 def requests_retry_session(
-        session=None, total=10, read=10, connect=1, status=10,
-        backoff_factor=5, status_forcelist=(500, 502, 503, 504)
+    session=None,
+    total=10,
+    read=10,
+    connect=1,
+    status=10,
+    backoff_factor=5,
+    status_forcelist=(500, 502, 503, 504),
 ):
     """
     Send an http request and retry on failures or redirects
@@ -118,11 +124,11 @@ def requests_retry_session(
         connect=connect,
         backoff_factor=backoff_factor,
         status_forcelist=status_forcelist,
-        method_whitelist=False
+        method_whitelist=False,
     )
     adapter = HTTPAdapter(max_retries=retry)
-    session.mount('http://', adapter)
-    session.mount('https://', adapter)
+    session.mount("http://", adapter)
+    session.mount("https://", adapter)
 
     return session
 
@@ -134,25 +140,24 @@ def check_service_status(url, exit_on_down=False, **request_kwargs):
     """
     # Check service
     try:
-        response = requests_retry_session(total=1,
-                                          connect=1).get(url, **request_kwargs)
+        response = requests_retry_session(total=1, connect=1).get(
+            url, **request_kwargs
+        )
     # Service is not up
     except requests.exceptions.ConnectionError:
-        logger.error(
-            f'Connection error! Is service at {url} up and running?'
-        )
+        logger.error(f"Connection error! Is service at {url} up and running?")
         is_down = True
     else:
         # Service is up but did not return 200 status code
         is_down = response.status_code >= 300
         if is_down:
             logger.warning(
-                f'Service {url} is up but returned non 200 status. Caused by '
-                f'{response.text}'
+                f"Service {url} is up but returned non 200 status. Caused by "
+                f"{response.text}"
             )
 
     if exit_on_down and is_down:
-        logger.info(f'Exiting program!')
+        logger.info(f"Exiting program!")
         exit(1)
 
     return is_down
@@ -166,5 +171,5 @@ def camel_to_snake(name):
     camelCase -> camel_case
     camelCASE -> camel_case
     """
-    name = re.sub('(.)([A-Z][a-z]+)', r'\1_\2', name)
-    return re.sub('([a-z0-9])([A-Z])', r'\1_\2', name).lower()
+    name = re.sub("(.)([A-Z][a-z]+)", r"\1_\2", name)
+    return re.sub("([a-z0-9])([A-Z])", r"\1_\2", name).lower()
