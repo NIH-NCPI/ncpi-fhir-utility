@@ -8,11 +8,13 @@ req_file = os.path.join(root_dir, 'requirements.txt')
 with open(req_file) as f:
     requirements = f.read().splitlines()
 
-version = __import__('ncpi_fhir_utility').__version__
-
 setup(
     name='ncpi-fhir-utility',
-    version=version,
+    use_scm_version={
+        "local_scheme": "dirty-tag",
+        "version_scheme": "post-release",
+    },
+    setup_requires=["setuptools_scm"],
     description=f'NCPI-FHIR Utility {FHIR_VERSION}',
     packages=find_packages(),
     entry_points={
