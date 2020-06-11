@@ -8,7 +8,9 @@ import sys
 FHIR_OWL_BIN = "fhir-owl-1.1.0-SNAPSHOT.jar"
 
 # Convert OWL file to FHIR CodeSystem
-ret = os.system(f'wget -N http://purl.obolibrary.org/obo/hp.owl && java -jar {FHIR_OWL_BIN} -i hp.owl -o hpo_codesystem.json -id hpo -name "Human Phenotype Ontology" -content not-present -mainNs http://purl.obolibrary.org/obo/HP_ -descriptionProp http://purl.org/dc/elements/1.1/subject -status active -codeReplace _,:')
+ret = os.system(
+    f'wget -N http://purl.obolibrary.org/obo/hp.owl && java -jar {FHIR_OWL_BIN} -i hp.owl -o hpo_codesystem.json -id hpo -name "Human Phenotype Ontology" -content not-present -mainNs http://purl.obolibrary.org/obo/HP_ -descriptionProp http://purl.org/dc/elements/1.1/subject -status active -codeReplace _,:'
+)
 
 if ret != 0:
     sys.exit()
