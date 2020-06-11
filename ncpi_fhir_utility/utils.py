@@ -157,7 +157,7 @@ def check_service_status(url, exit_on_down=False, **request_kwargs):
             )
 
     if exit_on_down and is_down:
-        logger.info(f"Exiting program!")
+        logger.info("Exiting program!")
         exit(1)
 
     return is_down

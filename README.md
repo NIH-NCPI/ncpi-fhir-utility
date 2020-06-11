@@ -7,6 +7,9 @@
   <a href="https://circleci.com/gh/ncpi-fhir/ncpi-fhir-utility">
   <img src="https://img.shields.io/circleci/project/github/ncpi-fhir/ncpi-fhir-utility.svg?style=for-the-badge">
   </a>
+  <a href="https://github.com/psf/black">
+  <img src="https://img.shields.io/badge/code%20style-black ----line--length 80-000000.svg?style=for-the-badge">
+  </a>
 </p>
 
 A small Python library and CLI that aids in FHIR model development.
