@@ -31,8 +31,11 @@ logger = logging.getLogger(__name__)
 
 
 def validate(
-        ig_control_filepath, clear_output=False, publisher_opts="",
-        refresh_publisher=True):
+    ig_control_filepath,
+    clear_output=False,
+    publisher_opts="",
+    refresh_publisher=True,
+):
     """
     Validate the FHIR data model (FHIR conformance and example resources)
 
@@ -254,8 +257,9 @@ def _fhir_validate(ig_control_filepath, publisher_opts, refresh_publisher):
     """
     # Run IG publisher to do FHIR validation
     args = [
-        RUN_IG_PUBLISHER_SCRIPT, ig_control_filepath,
-        str(int(refresh_publisher))
+        RUN_IG_PUBLISHER_SCRIPT,
+        ig_control_filepath,
+        str(int(refresh_publisher)),
     ]
     if publisher_opts:
         args.append(publisher_opts)

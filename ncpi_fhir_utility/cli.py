@@ -119,8 +119,12 @@ def validate(
     """
     m = "Validation"
     do(
-        m, app.validate, ig_control_filepath, clear_output, publisher_opts,
-        refresh_publisher=(not no_refresh_publisher)
+        m,
+        app.validate,
+        ig_control_filepath,
+        clear_output,
+        publisher_opts,
+        refresh_publisher=(not no_refresh_publisher),
     )
 
 
