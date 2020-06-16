@@ -5,8 +5,10 @@ set -eo pipefail
 trap "exit" INT
 
 echo "*********** START $(basename $0) script ***********"
+echo "Script parameters: $@"
 
-publisher_opts="${@:2}"
+refresh_image="$2"
+publisher_opts="${@:3}"
 default_ig_control_file="$(pwd)/site_root/ig.ini"
 ig_control_file="$default_ig_control_file"
 docker_image='kidsfirstdrc/fhir-ig-publisher:latest'
@@ -27,8 +29,10 @@ if [ ! -f "$ig_control_file" ]; then
     exit 1
 fi
 
-docker pull $docker_image
-
+if [[ $refresh_image -eq 1 ]];
+then
+    docker pull $docker_image
+fi
 # Run ig-publisher in a docker container
 ig_site_dir=$(dirname "$ig_control_file")
 ig_control_file=$(basename "$ig_control_file")

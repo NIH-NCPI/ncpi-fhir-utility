@@ -30,7 +30,12 @@ FILENAME_DELIM = RESOURCE_ID_DELIM
 logger = logging.getLogger(__name__)
 
 
-def validate(ig_control_filepath, clear_output=False, publisher_opts=""):
+def validate(
+    ig_control_filepath,
+    clear_output=False,
+    publisher_opts="",
+    refresh_publisher=True,
+):
     """
     Validate the FHIR data model (FHIR conformance and example resources)
 
@@ -57,6 +62,10 @@ def validate(ig_control_filepath, clear_output=False, publisher_opts=""):
     :param publisher_opts: IG publisher command line options forwarded directly
     to the publisher CLI
     :type publisher_opts: str
+    :param refresh_publisher: A flag specifying whether to pull down the IG
+    publisher Docker image from the remote Docker repository before running
+    the IG publisher
+    :type refresh_publisher: boolean
     """
     logger.info("Begin validation of FHIR data model")
     ig_control_filepath = os.path.abspath(
@@ -88,7 +97,7 @@ def validate(ig_control_filepath, clear_output=False, publisher_opts=""):
     _update_ig_config(resource_dicts, ig_resource_dict, add=True)
 
     # Do the standard HL7 FHIR validation via the IG Publisher
-    _fhir_validate(ig_control_filepath, publisher_opts)
+    _fhir_validate(ig_control_filepath, publisher_opts, refresh_publisher)
 
     logger.info("End validation of FHIR data model")
 
@@ -230,7 +239,7 @@ def publish_to_server(
             raise Exception(f"Publish failed! Caused by:\n{pformat(errors)}")
 
 
-def _fhir_validate(ig_control_filepath, publisher_opts):
+def _fhir_validate(ig_control_filepath, publisher_opts, refresh_publisher):
     """
     Run the HL7 IG Publisher to do standard FHIR validation on resource files
 
@@ -241,9 +250,17 @@ def _fhir_validate(ig_control_filepath, publisher_opts):
     :param publisher_opts: IG publisher command line options forwarded directly
     to the publisher CLI
     :type publisher_opts: str
+    :param refresh_publisher: A flag specifying whether to pull down the IG
+    publisher Docker image from the remote Docker repository before running
+    the IG publisher
+    :type refresh_publisher: boolean
     """
     # Run IG publisher to do FHIR validation
-    args = [RUN_IG_PUBLISHER_SCRIPT, ig_control_filepath]
+    args = [
+        RUN_IG_PUBLISHER_SCRIPT,
+        ig_control_filepath,
+        str(int(refresh_publisher)),
+    ]
     if publisher_opts:
         args.append(publisher_opts)
     subprocess.run(args, shell=False, check=True)

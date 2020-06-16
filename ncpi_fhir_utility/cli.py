@@ -77,6 +77,13 @@ def publish(resource_file_or_dir, base_url, user, pw):
 
 @click.command()
 @click.option(
+    "--no_refresh_publisher",
+    is_flag=True,
+    help="If present, the IG publisher Docker image "
+    "will not be pulled from the remote Docker repository. This allows "
+    "a local IG publisher Docker image to be used if desired.",
+)
+@click.option(
     "--publisher_opts",
     help="A string containing command line options accepted by the "
     "IG publisher. See https://confluence.hl7.org/display/"
@@ -92,7 +99,9 @@ def publish(resource_file_or_dir, base_url, user, pw):
     "ig_control_filepath",
     type=click.Path(exists=True, file_okay=True, dir_okay=False),
 )
-def validate(ig_control_filepath, clear_output, publisher_opts):
+def validate(
+    ig_control_filepath, clear_output, publisher_opts, no_refresh_publisher
+):
     """
     Validate FHIR conformance resources and validate example FHIR resources
     against the conformance resources by running the HL7 FHIR implementation
@@ -109,7 +118,14 @@ def validate(ig_control_filepath, clear_output, publisher_opts):
             the site
     """
     m = "Validation"
-    do(m, app.validate, ig_control_filepath, clear_output, publisher_opts)
+    do(
+        m,
+        app.validate,
+        ig_control_filepath,
+        clear_output,
+        publisher_opts,
+        refresh_publisher=(not no_refresh_publisher),
+    )
 
 
 @click.command()
