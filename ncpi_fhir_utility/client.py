@@ -217,14 +217,7 @@ class FhirApiClient(object):
         request_method_name = request_method_name.upper()
         request_url = urllib.parse.unquote(response.url)
 
-        success_status = {
-            "GET": {200},
-            "POST": {200, 201},
-            "PUT": {200, 201},
-            "DELETE": {204, 200},
-        }
-
-        if response.status_code in success_status.get(request_method_name, {}):
+        if response.ok:
             errors = self._errors_from_response(resp_content)
             if not errors:
                 success = True
