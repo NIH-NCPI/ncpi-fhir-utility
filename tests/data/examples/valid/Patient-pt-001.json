@@ -3,7 +3,7 @@
     "id": "pt-001",
     "meta": {
         "profile": [
-            "http://fhir.kids-first.io/StructureDefinition/participant"
+            "http://fhir.ncpi.io/StructureDefinition/participant"
         ]
     },
     "gender": "female",

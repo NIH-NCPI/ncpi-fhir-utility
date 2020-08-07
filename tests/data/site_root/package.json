@@ -1,15 +1,15 @@
 {
   "name": "kidsfirst",
   "version": "0.1.0",
-  "canonical": "http://fhir.kids-first.io",
-  "url": "http://fhir.kids-first.io",
-  "title": "Kids First Implementation Guide",
-  "description": "Documentation for the Kids First FHIR data model",
+  "canonical": "http://fhir.ncpi.io",
+  "url": "http://fhir.ncpi.io",
+  "title": "NCPI Implementation Guide",
+  "description": "Documentation for the NCPI FHIR data model",
   "dependencies": {
     "hl7.fhir.r4.core": "4.0.1"
   },
   "keywords": [
-    "Kids First",
+    "NCPI",
     "NIH",
     "Pediatric"
   ],

@@ -1,5 +1,5 @@
 """
-Entry point for the Kids First FHIR Model CLI which lets users:
+Entry point for the NCPI FHIR Model CLI which lets users:
 
 - Validate FHIR model files (conformance resources, example resources)
 - Convert FHIR model files between xml/json

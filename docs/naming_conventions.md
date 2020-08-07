@@ -37,7 +37,7 @@ Based on observations, the FHIR spec seems to use PascalCase for
 resource types (e.g. `Patient`, `SearchParameter`) and camelCase
 (e.g. `gender`, `birthDate`) for resource attributes.
 
-The Kids First resource `id` values will be lowercased with hyphens between
+The NCPI resource `id` values will be lowercased with hyphens between
 words (e.g. `age-at-event`, `sequencing-experiment`).  
 
 ## Resource File Name
@@ -122,8 +122,8 @@ Patient-pt-001.json
 ## Specific Rules for StructureDefinitions
 
 The following rules apply to non-Extension type `StructureDefinitions` and
-are intended to help Kids First separate the constraints for
-Protected Health Information (PHI) from the constraints in base Kids First
+are intended to help NCPI separate the constraints for
+Protected Health Information (PHI) from the constraints in base NCPI
 profiles.
 
 All `StructureDefinition.id` values will be split into two tokens. The first

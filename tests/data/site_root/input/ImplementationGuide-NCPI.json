@@ -1,11 +1,11 @@
 {
     "contact": [
         {
-            "name": "Kids First DRC",
+            "name": "NCPI",
             "telecom": [
                 {
                     "system": "email",
-                    "value": "mailto:support@kidsfirstdrc.org"
+                    "value": "mailto:support@ncpi.org"
                 }
             ]
         }
@@ -18,7 +18,7 @@
                 {
                     "generation": "markdown",
                     "nameUrl": "index.html",
-                    "title": "Kids First Implementation Guide"
+                    "title": "NCPI Implementation Guide"
                 }
             ],
             "title": "Table of Contents"
@@ -55,18 +55,18 @@
         ],
         "resource": []
     },
-    "description": "Documentation for the Kids First FHIR data model",
+    "description": "Documentation for the NCPI FHIR data model",
     "fhirVersion": [
         "4.0.1"
     ],
-    "id": "KidsFirst",
+    "id": "NCPI",
     "license": "CC0-1.0",
-    "name": "KidsFirstImplementationGuide",
-    "packageId": "kidsfirst",
-    "publisher": "Kids First DRC",
+    "name": "NCPIImplementationGuide",
+    "packageId": "ncpi",
+    "publisher": "NCPI",
     "resourceType": "ImplementationGuide",
     "status": "active",
-    "title": "Kids First Implementation Guide",
-    "url": "http://fhir.kids-first.io/ImplementationGuide/KidsFirst",
+    "title": "NCPI Implementation Guide",
+    "url": "http://fhir.ncpi.io/ImplementationGuide/NCPI",
     "version": "0.1.0"
 }
