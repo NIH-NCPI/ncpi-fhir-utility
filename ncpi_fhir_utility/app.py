@@ -373,7 +373,7 @@ def _update_ig_config(
             continue
 
         # Create the config entry
-        entry = _create_resource_config(rd)
+        entry = _create_resource_config(rd, ig_resource.get("publisher"))
 
         # Add/remove configuration entries
         if add:
@@ -395,13 +395,15 @@ def _update_ig_config(
     )
 
 
-def _create_resource_config(resource_dict):
+def _create_resource_config(resource_dict, publisher=""):
     """
     Create the expected IG configuration entry for a resource
 
     :param resource_dict: The resource payload from which a config entry will
     be created. See ncpi_fhir_utility.loader.load_resources.
     :type resource_dict: dict
+    :param publisher: The value of ImplementationGuide.publisher
+    :type publisher: str
     :returns: IG config entry for the resource
     """
     rid = resource_dict["content"].get("id")
@@ -427,10 +429,13 @@ def _create_resource_config(resource_dict):
         if profiles:
             suffix = f", Profiles: {profiles}"
 
+    if publisher:
+        publisher = publisher + " "
+
     return {
         "reference": {"reference": f"{rtype}/{rid}"},
-        "name": f"NCPI {rtype}/{rid}",
-        "description": f"NCPI {rtype} {rid}{suffix}",
+        "name": f"{publisher}{rtype}/{rid}",
+        "description": f"{publisher}{rtype} {rid}{suffix}",
         "exampleBoolean": is_example,
     }
 
