@@ -1,6 +1,6 @@
 {
   "resourceType": "StructureDefinition",
-  "url": "http://fhir.kids-first.io/StructureDefinition/Participant",
+  "url": "http://fhir.ncpi.io/StructureDefinition/Participant",
   "name": "Participant",
   "status": "draft",
   "fhirVersion": "4.0.0",

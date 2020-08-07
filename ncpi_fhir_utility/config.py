@@ -73,4 +73,4 @@ TORINOX_FHIR_VERSION_MAP = {
     "stu3": ("torinox-latest", "fhir"),
 }
 
-OUR_URLS = "http://fhir.kids-first.io,https://fhir.kids-first.io"
+OUR_URLS = "http://fhir.ncpi.io,https://fhir.ncpi.io"
