@@ -185,7 +185,8 @@ class FhirApiClient(object):
 
             {
                 'status_code': response.status_code,
-                'response': response.json() or response.text
+                'response': response.json() or response.text,
+                'response_headers': response.headers,
             }
 
         :param request_method_name: requests method name
@@ -240,6 +241,7 @@ class FhirApiClient(object):
                 "status_code": response.status_code,
                 "request_url": request_url,
                 "response": resp_content,
+                "response_headers": response.headers,
             },
         )
 

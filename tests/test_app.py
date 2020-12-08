@@ -87,7 +87,8 @@ def test_ig_validation(temp_site_root, dir_list, expected_code):
 
     # Run version update
     result = runner.invoke(
-        cli.update_versions, ["1.0.0", "--site_root", temp_site_root],
+        cli.update_versions,
+        ["1.0.0", "--site_root", temp_site_root],
     )
     assert result.exit_code == 0
 
@@ -102,11 +103,13 @@ def test_ig_validation(temp_site_root, dir_list, expected_code):
 def test_version_update_error(temp_site_root):
     runner = CliRunner()
     result = runner.invoke(
-        cli.update_versions, ["1.0.0", "--site_root", temp_site_root],
+        cli.update_versions,
+        ["1.0.0", "--site_root", temp_site_root],
     )
     assert result.exit_code == 0
     result = runner.invoke(
-        cli.update_versions, ["1.0.0", "--site_root", "fake"],
+        cli.update_versions,
+        ["1.0.0", "--site_root", "fake"],
     )
     assert result.exit_code > 0
 
