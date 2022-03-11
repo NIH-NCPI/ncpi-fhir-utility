@@ -1,6 +1,6 @@
 import logging
 from datetime import datetime
-
+import os
 import requests
 from requests.auth import AuthBase
 import datetime
@@ -31,7 +31,12 @@ class OAuth(AuthBase):
         self.expiration = datetime.datetime.now() + datetime.timedelta(seconds=(token['expires_in'] - 10))
 
     def get_access_token(self):
-        response_access_token = requests.post(
+        request_session = requests.Session()
+        caCert = os.getenv('CONFIG__REQUESTS__CA')
+        if caCert:
+            request_session.verify = caCert
+
+        response_access_token = request_session.post(
             self.url,
             data={'grant_type': 'client_credentials', 'client_id': self.client_id, 'client_secret': self.client_secret}
         )
@@ -41,7 +46,7 @@ class OAuth(AuthBase):
         if not self.uma_audience:
             return response_access_token.json()
         else:
-            response = requests.post(
+            response = request_session.post(
                 self.url,
                 headers={'Authorization': f"Bearer {response_access_token.json()['access_token']}"},
                 data={'grant_type': 'urn:ietf:params:oauth:grant-type:uma-ticket',
