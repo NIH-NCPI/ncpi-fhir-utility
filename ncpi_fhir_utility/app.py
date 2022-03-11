@@ -16,6 +16,7 @@ from configparser import ConfigParser
 
 from requests.auth import HTTPBasicAuth
 
+from ncpi_fhir_utility.oauth import OAuth
 from ncpi_fhir_utility.utils import read_json, write_json, camel_to_snake
 from ncpi_fhir_utility import loader
 from ncpi_fhir_utility.client import FhirApiClient
@@ -31,10 +32,10 @@ logger = logging.getLogger(__name__)
 
 
 def validate(
-    ig_control_filepath,
-    clear_output=False,
-    publisher_opts="",
-    refresh_publisher=True,
+        ig_control_filepath,
+        clear_output=False,
+        publisher_opts="",
+        refresh_publisher=True,
 ):
     """
     Validate the FHIR data model (FHIR conformance and example resources)
@@ -150,12 +151,16 @@ def update_ig_config(data_path, ig_control_filepath, add=True, rm_file=False):
 
 
 def publish_to_server(
-    resource_file_or_dir,
-    base_url,
-    username=None,
-    password=None,
-    fhir_version=None,
-    submission_order=RESOURCE_SUBMISSION_ORDER,
+        resource_file_or_dir,
+        base_url,
+        username=None,
+        password=None,
+        oauth_url=None,
+        oauth_client_id=None,
+        oauth_client_secret=None,
+        oauth_uma_audience=None,
+        fhir_version=None,
+        submission_order=RESOURCE_SUBMISSION_ORDER,
 ):
     """
     Push FHIR resources to a FHIR server
@@ -167,9 +172,16 @@ def publish_to_server(
     :param resource_file_or_dir: path to a directory containing FHIR resource
     files or path to a single resource file
     :type resource_file_or_dir: str
-    :param resource_type: directory containing FHIR resource files
-    :type resource_type: str
     :param username: Server account username
+    :param oauth_url: OAuth provider url used to get an access token
+    :type oauth_url: str
+    :param oauth_client_id: OAuth client id
+    :type oauth_client_id: str
+    :param oauth_client_secret: OAuth client secret
+    :type oauth_client_secret: str
+    :param oauth_uma_audience: OAuth audience to use to get an UMA ticket. If not present, a singular access token
+    is used.
+    :type oauth_uma_audience: str
     :type username: str
     :param password: Server account password
     :type password: str
@@ -182,6 +194,8 @@ def publish_to_server(
 
     if username and password:
         auth = HTTPBasicAuth(username, password)
+    elif oauth_url and oauth_client_id and oauth_client_secret:
+        auth = OAuth(oauth_url, oauth_client_id, oauth_client_secret, oauth_uma_audience)
     else:
         auth = None
 
@@ -342,11 +356,11 @@ def _custom_validate(resource_dicts):
                 f"<resource type>-<resource id>.json. File {filename}{ext} "
                 f"should be: {expected_filename}{ext}"
             )
-        logger.info(f"☑️ Initial validation passed for resource {filename+ext}")
+        logger.info(f"☑️ Initial validation passed for resource {filename + ext}")
 
 
 def _update_ig_config(
-    resource_dicts, ig_resource_dict, add=True, rm_file=False
+        resource_dicts, ig_resource_dict, add=True, rm_file=False
 ):
     """
     Helper for update_ig_config

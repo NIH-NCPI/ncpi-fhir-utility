@@ -48,6 +48,12 @@ def cli():
 @cli.command()
 @click.option("--password", "pw", help="Client secret or user password")
 @click.option("--username", "user", help="Client id or username")
+@click.option("--oauth-url", "oauth_url", help="URL of token endpoint for OAuth authentication")
+@click.option("--oauth-client-id", "oauth_client_id", help="Client ID for OAuth authentication")
+@click.option("--oauth-client-secret", "oauth_client_secret", help="Client secret for OAuth authentication")
+@click.option("--oauth-uma-audience", "oauth_uma_audience", help="Audience parameter to use to fetch UMA ticket. If "
+                                                                  "not present, a standard access token will be used "
+                                                                  "as bearer token")
 @click.option(
     "--base_url",
     type=str,
@@ -59,7 +65,7 @@ def cli():
     "resource_file_or_dir",
     type=click.Path(exists=True, file_okay=True, dir_okay=True),
 )
-def publish(resource_file_or_dir, base_url, user, pw):
+def publish(resource_file_or_dir, base_url, user, pw, oauth_url, oauth_client_id, oauth_client_secret, oauth_uma_audience):
     """
     Push FHIR model files to FHIR server. Default use of this method is to
     push FHIR model files to the Simplifier FHIR server configured in
@@ -72,7 +78,7 @@ def publish(resource_file_or_dir, base_url, user, pw):
             'publish to the Simplifier project
     """
     m = "Publish"
-    do(m, app.publish_to_server, resource_file_or_dir, base_url, user, pw)
+    do(m, app.publish_to_server, resource_file_or_dir, base_url, user, pw, oauth_url, oauth_client_id, oauth_client_secret, oauth_uma_audience)
 
 
 @click.command()

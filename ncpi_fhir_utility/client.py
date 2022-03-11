@@ -56,7 +56,7 @@ class FhirApiClient(object):
         :param endpoint: Optional FHIR endpoint to use for all requests
         :type endpoint: str
         :param auth: basic auth parameters
-        :type auth: requests.auth.HTTPBasicAuth object
+        :type auth: requests.auth.AuthBase object
 
         :returns: a tuple (success boolean, result dict) See send_request
         for details.

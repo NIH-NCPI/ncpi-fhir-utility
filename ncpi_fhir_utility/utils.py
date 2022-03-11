@@ -118,6 +118,10 @@ def requests_retry_session(
     """
     session = session or requests.Session()
 
+    caCert = os.getenv('CONFIG__REQUESTS__CA')
+    if caCert:
+        session.verify = caCert
+
     retry = Retry(
         total=total,
         read=read,
